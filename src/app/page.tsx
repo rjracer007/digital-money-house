@@ -1,66 +1,91 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import Image from 'next/image';
 
-export default function Home() {
+// Simulamos la llamada a la base de datos/API
+async function getLandingData() {
+  // En el Sprint 2 o 3, aquí usarías: await fetch('https://api-digital-money.com/content')
+  return {
+    hero: {
+      title: "De ahora en adelante, hacé más con tu dinero",
+      description: "Tu nueva billetera virtual. Rápida, segura y sin comisiones. Manejá tus ahorros, pagá servicios y transferí al instante.",
+      imageUrl: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=1000"
+    },
+    features: [
+      {
+        title: "Transferencias inmediatas",
+        desc: "Enviá y recibí dinero de cualquier cuenta bancaria o virtual en segundos.",
+        icon: "💸"
+      },
+      {
+        title: "Pago de servicios",
+        desc: "Pagá luz, gas, internet y más desde la comodidad de tu casa.",
+        icon: "🧾"
+      }
+    ]
+  };
+}
+
+export default async function LandingPage() {
+  const data = await getLandingData();
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header / Nav */}
+      <header className="bg-gray-900 text-white py-4 px-6 flex justify-between items-center sticky top-0 z-50">
+        <div className="text-xl font-bold text-green-400">Digital Money House</div>
+        <nav className="flex gap-4">
+          <Link href="/login" className="px-4 py-2 rounded border border-green-500 text-green-500 hover:bg-green-500 hover:text-white transition-colors text-sm font-semibold">
+            Iniciar sesión
+          </Link>
+          <Link href="/register" className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition-colors text-sm font-semibold">
+            Crear cuenta
+          </Link>
+        </nav>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative h-[500px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src={data.hero.imageUrl}
+            alt="DMH Billetera"
+            className="w-full h-full object-cover brightness-50"
+          />
+        </div>
+
+        <div className="relative z-10 text-center px-4 max-w-4xl">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6">
+            {data.hero.title}
+          </h1>
+          <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+            {data.hero.description}
           </p>
+          <Link href="/register" className="bg-green-500 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-green-600 transition-transform hover:scale-105 inline-block">
+            Empezar ahora
+          </Link>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Tus finanzas, simplificadas</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {data.features.map((feature, index) => (
+              <div key={index} className="p-8 border border-gray-100 rounded-2xl bg-gray-50 hover:shadow-md transition-shadow">
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Footer simple */}
+      <footer className="mt-auto bg-gray-100 py-8 px-6 text-center text-gray-500 text-sm">
+        © 2026 Digital Money House. Todos los derechos reservados.
+      </footer>
+    </main>
   );
 }
