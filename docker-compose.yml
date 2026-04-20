@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  dmh-production-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digital-money-house-aws
+    ports:
+      - "80:3000" # Exponemos el puerto 80 (HTTP estándar) mapeado al 3000 de Next
+    environment:
+      - NODE_ENV=production
+      - API_URL=https://api.digitalmoney.house # URL ficticia del backend en AWS
+    restart: always # Si el contenedor falla en la nube, se reinicia solo

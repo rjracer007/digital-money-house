@@ -1,20 +1,37 @@
-# Usamos Node como base
-FROM node:18-alpine
+# Etapa 1: Instalación de dependencias
+FROM node:18-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Directorio de trabajo
+# Etapa 2: Construcción (Build) de Next.js para producción
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+# Construimos la aplicación optimizada
+RUN npm run build
+
+# Etapa 3: Imagen final para producción (Runner)
+FROM node:18-alpine AS runner
 WORKDIR /app
 
-# Copiamos package.json y package-lock.json
-COPY package*.json ./
+# Configuramos el entorno de producción
+ENV NODE_ENV production
 
-# Instalamos dependencias
-RUN npm install
+# Creamos un usuario no-root por seguridad (Buenas prácticas AWS)
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Copiamos el resto del código
-COPY . .
+# Copiamos solo lo necesario desde la etapa builder
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Exponemos el puerto de Next.js
+USER nextjs
+
 EXPOSE 3000
+ENV PORT 3000
 
-# Comando para desarrollo
-CMD ["npm", "run", "dev"]
+# Comando para iniciar el servidor Next.js standalone
+CMD ["node", "server.js"]
