@@ -3,26 +3,28 @@ import Image from 'next/image';
 
 // Simulamos la llamada a la base de datos/API
 async function getLandingData() {
-  // En el Sprint 2 o 3, aquí usarías: await fetch('https://api-digital-money.com/content')
-  return {
-    hero: {
-      title: "De ahora en adelante, hacé más con tu dinero",
-      description: "Tu nueva billetera virtual. Rápida, segura y sin comisiones. Manejá tus ahorros, pagá servicios y transferí al instante.",
-      imageUrl: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=1000"
-    },
-    features: [
-      {
-        title: "Transferencias inmediatas",
-        desc: "Enviá y recibí dinero de cualquier cuenta bancaria o virtual en segundos.",
-        icon: "💸"
-      },
-      {
-        title: "Pago de servicios",
-        desc: "Pagá luz, gas, internet y más desde la comodidad de tu casa.",
-        icon: "🧾"
-      }
-    ]
-  };
+  // Usamos localhost para desarrollo, o la URL de Vercel en producción
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+  try {
+    // fetch a nuestra propia API simulada
+    const res = await fetch(`${apiUrl}/api/landing`, {
+      cache: 'no-store' // Obligamos a que siempre consulte la API, demostrando que es dinámico
+    });
+
+    if (!res.ok) {
+      throw new Error('Error en la respuesta de la API');
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error("Error al obtener datos:", error);
+    // Retorno de seguridad (Fallback) por si la API falla
+    return {
+      hero: { title: "Digital Money House", description: "Cargando...", imageUrl: "" },
+      features: []
+    };
+  }
 }
 
 export default async function LandingPage() {

@@ -39,6 +39,16 @@ export default function IngresarDineroPage() {
         setStep(3);
     };
 
+    // Estados para el feedback de copiado
+    const [copyFeedback, setCopyFeedback] = useState<'cvu' | 'alias' | null>(null);
+
+    // Función para copiar al portapapeles
+    const handleCopy = async (text: string, type: 'cvu' | 'alias') => {
+        await navigator.clipboard.writeText(text);
+        setCopyFeedback(type);
+        setTimeout(() => setCopyFeedback(null), 2000);
+    };
+
     const getSelectedCard = () => MOCK_CARDS.find(c => c.id === selectedCardId);
 
     return (
@@ -171,13 +181,32 @@ export default function IngresarDineroPage() {
                     <p className="text-gray-600 mb-8">Copiá tu CVU o Alias para transferirte dinero desde otra cuenta bancaria o billetera virtual.</p>
 
                     <div className="bg-gray-50 p-6 rounded-2xl flex flex-col gap-6">
-                        <div>
-                            <p className="text-xs font-bold uppercase text-gray-500 mb-1">Tu CVU</p>
-                            <p className="font-mono text-xl text-gray-800 font-medium tracking-wider">0000003100012345678901</p>
+                        {/* CVU con botón de copiar */}
+                        <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+                            <div>
+                                <p className="text-xs font-bold uppercase text-gray-500 mb-1">Tu CVU</p>
+                                <p className="font-mono text-xl text-gray-800 font-medium tracking-wider">0000003100012345678901</p>
+                            </div>
+                            <button
+                                onClick={() => handleCopy('0000003100012345678901', 'cvu')}
+                                className="p-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-xl font-bold transition-colors"
+                            >
+                                {copyFeedback === 'cvu' ? '✅ Copiado' : '📋 Copiar'}
+                            </button>
                         </div>
-                        <div>
-                            <p className="text-xs font-bold uppercase text-gray-500 mb-1">Tu Alias</p>
-                            <p className="text-xl text-gray-800 font-bold">$estiven.pago.casa</p>
+
+                        {/* Alias con botón de copiar */}
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <p className="text-xs font-bold uppercase text-gray-500 mb-1">Tu Alias</p>
+                                <p className="text-xl text-gray-800 font-bold">$estiven.pago.casa</p>
+                            </div>
+                            <button
+                                onClick={() => handleCopy('$estiven.pago.casa', 'alias')}
+                                className="p-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-xl font-bold transition-colors"
+                            >
+                                {copyFeedback === 'alias' ? '✅ Copiado' : '📋 Copiar'}
+                            </button>
                         </div>
                     </div>
                 </section>

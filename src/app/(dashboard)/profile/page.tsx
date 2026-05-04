@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 export default function ProfilePage() {
-    // Datos iniciales de Estiven (Mock para Sprint 2)
-    const [userData] = useState({
+    // Datos principales
+    const [userData, setUserData] = useState({
         firstName: 'Estiven',
         lastName: 'Digital',
         dni: '12.345.678',
@@ -12,19 +12,23 @@ export default function ProfilePage() {
         cvu: '0000003100012345678901'
     });
 
+    // Estados para Edición de Perfil
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [tempUserData, setTempUserData] = useState(userData);
+
+    // Estados para Alias
     const [alias, setAlias] = useState('$estiven.pago.casa');
     const [isEditingAlias, setIsEditingAlias] = useState(false);
     const [tempAlias, setTempAlias] = useState(alias);
+
     const [copyFeedback, setCopyFeedback] = useState<'cvu' | 'alias' | null>(null);
 
-    // Función para copiar al portapapeles
     const handleCopy = async (text: string, type: 'cvu' | 'alias') => {
         await navigator.clipboard.writeText(text);
         setCopyFeedback(type);
         setTimeout(() => setCopyFeedback(null), 2000);
     };
 
-    // Validación de Alias: tres palabras separadas por puntos iniciando con $
     const saveAlias = () => {
         const aliasRegex = /^\$[a-z0-9]+\.[a-z0-9]+\.[a-z0-9]+$/i;
         if (aliasRegex.test(tempAlias)) {
@@ -35,33 +39,88 @@ export default function ProfilePage() {
         }
     };
 
+    // NUEVO: Función para guardar el perfil
+    const saveProfile = () => {
+        setUserData(tempUserData);
+        setIsEditingProfile(false);
+    };
+
     return (
         <div className="max-w-4xl mx-auto flex flex-col gap-8">
             <h1 className="text-3xl font-bold text-gray-800">Mi Perfil</h1>
 
-            {/* Tarjeta de Datos Personales */}
+            {/* --- TARJETA DE DATOS PERSONALES CORREGIDA --- */}
             <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-gray-700">Tus datos</h2>
-                    <button className="text-green-500 font-semibold hover:underline">Editar</button>
+                    {isEditingProfile ? (
+                        <button onClick={saveProfile} className="text-white bg-green-500 px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                            Guardar
+                        </button>
+                    ) : (
+                        <button onClick={() => setIsEditingProfile(true)} className="text-green-500 font-semibold hover:underline">
+                            Editar
+                        </button>
+                    )}
                 </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <p className="text-sm text-gray-400">Email</p>
-                        <p className="font-medium">{userData.email}</p>
+                        <p className="text-sm text-gray-400 mb-1">Email</p>
+                        {isEditingProfile ? (
+                            <input
+                                type="email"
+                                value={tempUserData.email}
+                                onChange={(e) => setTempUserData({ ...tempUserData, email: e.target.value })}
+                                className="w-full p-2 border border-gray-300 rounded focus:border-green-500 outline-none"
+                            />
+                        ) : (
+                            <p className="font-medium">{userData.email}</p>
+                        )}
                     </div>
                     <div>
-                        <p className="text-sm text-gray-400">Nombre completo</p>
-                        <p className="font-medium">{userData.firstName} {userData.lastName}</p>
+                        <p className="text-sm text-gray-400 mb-1">Nombre</p>
+                        {isEditingProfile ? (
+                            <input
+                                type="text"
+                                value={tempUserData.firstName}
+                                onChange={(e) => setTempUserData({ ...tempUserData, firstName: e.target.value })}
+                                className="w-full p-2 border border-gray-300 rounded focus:border-green-500 outline-none"
+                            />
+                        ) : (
+                            <p className="font-medium">{userData.firstName}</p>
+                        )}
                     </div>
                     <div>
-                        <p className="text-sm text-gray-400">DNI</p>
-                        <p className="font-medium">{userData.dni}</p>
+                        <p className="text-sm text-gray-400 mb-1">Apellido</p>
+                        {isEditingProfile ? (
+                            <input
+                                type="text"
+                                value={tempUserData.lastName}
+                                onChange={(e) => setTempUserData({ ...tempUserData, lastName: e.target.value })}
+                                className="w-full p-2 border border-gray-300 rounded focus:border-green-500 outline-none"
+                            />
+                        ) : (
+                            <p className="font-medium">{userData.lastName}</p>
+                        )}
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-400 mb-1">DNI</p>
+                        {isEditingProfile ? (
+                            <input
+                                type="text"
+                                value={tempUserData.dni}
+                                onChange={(e) => setTempUserData({ ...tempUserData, dni: e.target.value })}
+                                className="w-full p-2 border border-gray-300 rounded focus:border-green-500 outline-none"
+                            />
+                        ) : (
+                            <p className="font-medium">{userData.dni}</p>
+                        )}
                     </div>
                 </div>
             </section>
 
-            {/* Tarjeta de Gestión de CVU y Alias */}
+            {/* --- TARJETA DE GESTIÓN DE CVU Y ALIAS (Queda igual) --- */}
             <section className="bg-green-500 text-gray-900 p-8 rounded-3xl shadow-lg">
                 <h2 className="text-xl font-bold mb-6">Copia tu CVU o alias para recibir transferencias</h2>
 
